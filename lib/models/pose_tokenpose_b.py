@@ -44,7 +44,7 @@ class TokenPose_B(nn.Module):
                                  hidden_heatmap_dim=cfg.MODEL.HEATMAP_SIZE[1]*cfg.MODEL.HEATMAP_SIZE[0]//8,
                                  heatmap_dim=cfg.MODEL.HEATMAP_SIZE[1]*cfg.MODEL.HEATMAP_SIZE[0],
                                  heatmap_size=[cfg.MODEL.HEATMAP_SIZE[1],cfg.MODEL.HEATMAP_SIZE[0]],
-                                 pos_embedding_type=cfg.MODEL.POS_EMBEDDING_TYPE)
+                                 pos_embedding_type=cfg.MODEL.POS_EMBEDDING_TYPE,target_type=cfg..MODEL.TARGET_TYPE)
         ###################################################3
 
     def forward(self, x):
