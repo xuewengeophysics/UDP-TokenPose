@@ -220,7 +220,7 @@ def main():
             'optimizer': optimizer.state_dict(),
         }, best_model, final_output_dir)
 
-        ipdb.set_trace()
+        ##ipdb.set_trace()
 
     final_model_state_file = os.path.join(
         final_output_dir, 'final_state.pth'

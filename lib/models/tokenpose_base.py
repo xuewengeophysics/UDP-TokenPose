@@ -428,7 +428,7 @@ class TokenPose_TB_base(nn.Module):
             nn.init.constant_(m.weight, 1.0)
 
     def forward(self, feature, mask = None):
-        ipdb.set_trace()
+        ##ipdb.set_trace()
         ##feature.shape为[1, 32, 64, 48]
         ##self.patch_size为[4, 3]，表示每个小image patch的h和w分别为4、3；
         p = self.patch_size
@@ -467,6 +467,7 @@ class TokenPose_TB_base(nn.Module):
         ##x = rearrange(x,'b c (p1 p2) -> b c p1 p2',p1=self.heatmap_size[0],p2=self.heatmap_size[1])
         ##[1, 17, 3072*3] -> [1, 17*3, 64, 48]
         x = rearrange(x,'b c (p1 p2 factor) -> b (c factor) p1 p2',p1=self.heatmap_size[0],p2=self.heatmap_size[1])
+        ##ipdb.set_trace()
         return x
 
 class TokenPose_L_base(nn.Module):
