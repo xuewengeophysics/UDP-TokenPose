@@ -63,10 +63,10 @@ self.mlp_head = nn.Sequential(
 
 
 ```python
-if not cfg.MODEL.TARGET_TYPE=='offset':
-	self.factor=1
-else:
+if cfg.MODEL.TARGET_TYPE=='offset':
 	self.factor=3
+else:
+	self.factor=1
 heatmap_dim = heatmap_dim*self.factor
 ```
 
@@ -74,7 +74,7 @@ heatmap_dim = heatmap_dim*self.factor
 
 ```python
 ##[1, 17, 3072*3] -> [1, 17*3, 64, 48]
-x = rearrange(x,'b c (p1 p2 factor) -> b (c factor) p1 p2',p1=self.heatmap_size[0],p2=self.heatmap_size[1],factor=self.factor)
+x = rearrange(x,'b c (p1 p2 factor) -> b (c factor) p1 p2',p1=self.heatmap_size[0],p2=self.heatmap_size[1])
 ```
 
 
@@ -97,8 +97,18 @@ offset_y = net_output[:,2::3,:] * kps_pos_distance_y
 
 
 
+是没有问题的，上面的`rearrange`的方式是将原来的`[B, 17, heatmap_size * 3]`的tensor按照各个关键点*3的方式转换为`[B, 17 * 3, heatmap_size]`。
+
+
+
 ## nms
 
 ## utils
 
 + TokenPose与DarkPose完全一致，因此直接采用UDP中的处理方式
+
+
+
+## tools
+
++ 以TokenPose为主，根据UDP-Pose修改offset的loss；
