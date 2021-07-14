@@ -302,7 +302,7 @@ class Bottleneck(nn.Module):
         return out
 
 class TokenPose_TB_base(nn.Module):
-    def __init__(self, *, feature_size, patch_size, num_keypoints, dim, depth, heads, mlp_dim, apply_init=False, apply_multi=True, hidden_heatmap_dim=64*6,heatmap_dim=64*48,heatmap_size=[64,48], channels = 3, dropout = 0., emb_dropout = 0., pos_embedding_type="learnable"):
+    def __init__(self, *, feature_size, patch_size, num_keypoints, dim, depth, heads, mlp_dim, apply_init=False, apply_multi=True, hidden_heatmap_dim=64*6,heatmap_dim=64*48,heatmap_size=[64,48], channels = 3, dropout = 0., emb_dropout = 0., pos_embedding_type="learnable", target_type="offset"):
         super().__init__()
         assert isinstance(feature_size,list) and isinstance(patch_size,list), 'image_size and patch_size should be list'
         assert feature_size[0] % patch_size[0] == 0 and feature_size[1] % patch_size[1] == 0, 'Image dimensions must be divisible by the patch size.'
@@ -330,6 +330,13 @@ class TokenPose_TB_base(nn.Module):
         self.transformer = Transformer(dim, depth, heads, mlp_dim, dropout,num_keypoints=num_keypoints,all_attn=self.all_attn, scale_with_head=True)
 
         self.to_keypoint_token = nn.Identity()
+
+        ##for UDP offset
+        if target_type=='offset':
+            self.factor=3
+        else:
+            self.factor=1
+        heatmap_dim = heatmap_dim*self.factor
 
         self.mlp_head = nn.Sequential(
             nn.LayerNorm(dim),
@@ -457,7 +464,9 @@ class TokenPose_TB_base(nn.Module):
         ##[1, 17, 192] -> [1, 17, 3072]；3072 = 64 x 48
         x = self.mlp_head(x)
         ##[1, 17, 3072] -> [1, 17, 64, 48]
-        x = rearrange(x,'b c (p1 p2) -> b c p1 p2',p1=self.heatmap_size[0],p2=self.heatmap_size[1])
+        ##x = rearrange(x,'b c (p1 p2) -> b c p1 p2',p1=self.heatmap_size[0],p2=self.heatmap_size[1])
+        ##[1, 17, 3072*3] -> [1, 17*3, 64, 48]
+        x = rearrange(x,'b c (p1 p2 factor) -> b (c factor) p1 p2',p1=self.heatmap_size[0],p2=self.heatmap_size[1])
         return x
 
 class TokenPose_L_base(nn.Module):
